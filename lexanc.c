@@ -256,6 +256,7 @@ TOKEN number(TOKEN tok) {
 	double significand;
 	int unsignedOverflow = 0;
 	double numAfterDigits = 0;
+	double backup_num;
 	/* consume characters as long as it is '0' and not a digit other than 0 or . */
 	while ((c = peekchar()) != EOF && c == '0') {
 		getchar();
@@ -267,6 +268,11 @@ TOKEN number(TOKEN tok) {
 		charval = (c - '0');
 		if (num >= 214748364 && charval > 7) {
 			unsignedOverflow = 1;
+			if (num == 214748364) {
+				backup_num = num;
+			} else {
+				backup_num = 999999999;
+			}
 		}
 		num = num * 10 + charval;
 		numOfDigitsBeforeDecimal++;
@@ -276,6 +282,7 @@ TOKEN number(TOKEN tok) {
 		tok->datatype = INTEGER;
 		if (unsignedOverflow == 1) {
 			printf("Integer number out of range\n");
+			tok->intval = backup_num;
 		} else {
 			tok->intval = num;
 		}
